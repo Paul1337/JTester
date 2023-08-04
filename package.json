@@ -1,0 +1,16 @@
+{
+    "name": "jtester",
+    "version": "1.0.0",
+    "description": "A tool for testing, with support of runtime testing",
+    "main": "index.js",
+    "scripts": {},
+    "keywords": [
+        "tests",
+        "test",
+        "mock",
+        "runtime",
+        "expect"
+    ],
+    "author": "",
+    "license": "ISC"
+}
