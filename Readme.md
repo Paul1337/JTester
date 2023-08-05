@@ -1,4 +1,4 @@
-# This is a simple node.js library for creating unit tests. 
+# A simple node.js library for creating unit tests. 
 With support of run-time unit-testing.
 
 ## Getting started
@@ -65,6 +65,11 @@ And more:
 - `toBeNull()`
 - `toBeTruthy()`
 - `toBeNaN()`
+
+Also, it supports **not** keyword to build inversed tests, like this:
+```js
+expect(10).not.toBe(20)
+```
 
 Above methods return *ExpectationResult*, with which test() function works natively. 
 If you just want to get boolean true / false, you could use any of that function preceded with underscore:  
