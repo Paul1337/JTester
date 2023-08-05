@@ -53,7 +53,7 @@ Actually compares 2 values, if objects - recursively iterating properties. For p
 - `toBeCloseTo(value: number, digits = 2)`  
 Used to compare floating point numbers with precision given in the second agrument
 
-- `toHaveProperty(keyPath, value, strict = false])`  
+- `toHaveProperty(keyPath, value, strict = false)`  
 Checks if object has property given in keyPath (in format of string where properties are divided by dots: "first.pos.x"). If value is specified, than tries to compare that property with value using toEqual or toEqualStrict depending on third argument "strict", which is false by default
 
 - `toContain(item)`  
