@@ -38,7 +38,7 @@ class ExpectationResult {
 
     inversed() {
         const res = new ExpectationResult(!this.state, this.recieved, this.expectAction, this.expected);
-        res.isInversed = true;
+        res.isInversed = !res.isInversed;
         return res;
     }
 }
