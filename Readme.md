@@ -73,7 +73,8 @@ expect(10).not.toBe(20)
 
 Above methods return *ExpectationResult*, with which test() function works natively. 
 If you just want to get boolean true / false, you could use any of that function preceded with underscore:  
-lik ```_toBe(value: any): boolean;```
+like  ```_toBe(value: any): boolean;```
+
 ```
 ExpectationResult {
   state: boolean;
