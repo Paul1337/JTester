@@ -66,7 +66,7 @@ And more:
 - `toBeTruthy()`
 - `toBeNaN()`
 
-Also, it supports **not** keyword to build inversed tests, like this:
+Also, we support **not** keyword to build inversed tests, like this:
 ```js
 expect(10).not.toBe(20)
 ```
