@@ -152,6 +152,36 @@ class Expectation {
             return cmpFn.call(this, value);
         }
     }
+
+    toResolve(value, strict = false) {
+        if (!(this.value instanceof Promise)) {
+            throw new TypeError('Expectation value should be promise to check for resolving!');
+        }
+        return this.value
+            .then((resolveValue) => {
+                if (!value) return new ExpectationResult(true, this.value, 'to resolve');
+                const expectation = new Expectation(resolveValue);
+                return strict ? expectation.toEqualStrict(value) : expectation.toEqual(value);
+            })
+            .catch(() => {
+                return new ExpectationResult(false, this.value, 'to resolve');
+            });
+    }
+
+    toReject(value, strict = false) {
+        if (!(this.value instanceof Promise)) {
+            throw new TypeError('Expectation value should be promise to check for rejecting!');
+        }
+        return this.value
+            .then(() => {
+                return new ExpectationResult(false, this.value, 'to reject');
+            })
+            .catch((rejectValue) => {
+                if (!value) return new ExpectationResult(true, this.value, 'to reject');
+                const expectation = new Expectation(rejectValue);
+                return strict ? expectation.toEqualStrict(value) : expectation.toEqual(value);
+            });
+    }
 }
 
 module.exports = Expectation;

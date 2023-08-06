@@ -1,3 +1,5 @@
+const ExpectationResult = require('./Expectation/ExpectationResult.js');
+
 const globalTests = {};
 let finishCallback = null;
 
@@ -7,16 +9,26 @@ const resetTests = () => {
     globalTests.all = 0;
 };
 
-const test = async (title, input) => {
-    console.log(`JTesting started: ${title}`);
+const test = async (blockTitle, input) => {
+    console.log(`JTesting started: ${blockTitle}`);
 
     let passed = 0;
-    const tests = Array.isArray(input) ? input : [input];
+    const tests = input instanceof ExpectationResult || input instanceof Promise ? [input] : input;
     const promises = [];
-    globalTests.all += tests.length;
-    for (let i = 0; i < tests.length; i++) {
-        const test = tests[i];
-        const testInfo = `${title} (${i + 1})`;
+    const blockTests = tests.length ?? Object.keys(tests).length;
+    globalTests.all += blockTests;
+    for (let testKey in tests) {
+        let test = tests[testKey];
+        let testName = isNaN(testKey) ? testKey : Number(testKey) + 1;
+        if (Array.isArray(test)) {
+            if (test.length > 1) {
+                testName = tests[testKey][0];
+                test = tests[testKey][1];
+            } else {
+                test = tests[testKey][0];
+            }
+        }
+        const testInfo = `${blockTitle} (${testName})`;
         if (test instanceof Promise) {
             promises.push(
                 test
@@ -36,9 +48,9 @@ const test = async (title, input) => {
 
     await Promise.all(promises);
 
-    console.log(`JTesting finished: ${title}`);
-    console.log(`Passed ${passed} of ${tests.length}`);
-    const failed = tests.length - passed;
+    console.log(`JTesting finished: ${blockTitle}`);
+    console.log(`Passed ${passed} of ${blockTests}`);
+    const failed = blockTests - passed;
     if (failed === 0) console.log('OK');
     else console.log(`Failed: ${failed} tests`);
 };
@@ -65,7 +77,7 @@ const afterAll = (callback, delay = 0) => {
 
 const onTestError = (err, testInfo = 'Test') => {
     globalTests.failed++;
-    console.log(`${testInfo}: ERROR: ${err.message}`);
+    console.log(`${testInfo}: ERROR ${err.message ? err.message : err}`);
     const allDone = globalTests.failed + globalTests.passed === globalTests.all;
     if (allDone && typeof finishCallback === 'function') finishCallback();
 };

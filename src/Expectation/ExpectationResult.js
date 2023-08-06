@@ -21,6 +21,9 @@ class ExpectationResult {
 
     formatValue(value) {
         if (!value) return '';
+        if (value instanceof Promise) {
+            return '<Promise>';
+        }
         if (typeof value === 'object') {
             return JSON.stringify(value);
         }
