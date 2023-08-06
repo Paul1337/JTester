@@ -18,7 +18,7 @@ Several tests in a named block:
 test('Math', [
   expect(2 * 2).toBe(4),
   expect(5 - 3).toBe(2),
-  expect(1002).toBeCloseTo(1002.00035),
+  expect(0.4 + 0.2).toBeCloseTo(0.6),
 ]);
 ```
 
@@ -29,9 +29,34 @@ import { expect, test, afterAll, printResult } from 'JTester';
 test('Math', [
   expect(2 * 2).toBe(4),
   expect(5 - 3).toBe(2),
-  expect(1002).toBeCloseTo(1002.00035),
+  expect(0.4 + 0.2).toBeCloseTo(0.6),
 ]);
 afterAll(printResult);
+```
+
+If you want to describe each test in a block, you can do it several ways:
+
+```js
+// passing object
+test('Math', {
+  'Multiplication': expect(2 * 2).toBe(4),
+  'Adding float numbers': expect(0.4 + 0.2).toBeCloseTo(0.6),
+});
+// passing array of arrays
+test('Math', [
+  ['Multiplication', expect(2 * 2).toBe(4)],
+  ['Adding float numbers', expect(0.4 + 0.2).toBeCloseTo(0.6)],
+]);
+// also, you can descibe only some of tests (Not described ones will be numerated)
+test('Math', [
+  expect(2 * 2).toBe(4), // [expect(2 * 2).toBe(4)] would also be valid
+  ['Adding float numbers', expect(0.4 + 0.2).toBeCloseTo(0.6)],
+]);
+```
+
+Library supports methods to work with async functions like **toResolve**, and **toReject**, but you can also pass *Promise* which returns **ExpectationResult** or rejects in the **test** function:
+```js
+test('some async', asyncFunction().then((res) => expect(res).toBe('some res')));
 ```
 
 ## API
@@ -53,11 +78,20 @@ Actually compares 2 values, if objects - recursively iterating properties. For p
 - `toBeCloseTo(value: number, digits = 2)`  
 Used to compare floating point numbers with precision given in the second agrument
 
-- `toHaveProperty(keyPath, value, strict = false)`  
-Checks if object has property given in keyPath (in format of string where properties are divided by dots: "first.pos.x"). If value is specified, than tries to compare that property with value using toEqual or toEqualStrict depending on third argument "strict", which is false by default
+- `toHaveProperty(keyPath: string, value: any, strict = false)`  
+Checks if object has property given in keyPath (in format of string where properties are divided by dots: "first.pos.x"). If value is specified, than tries to compare that property with value using toEqual or toEqualStrict depending on third argument **strict**, which is false by default
 
-- `toContain(item)`  
+- `toContain(item: any)`  
 Checks that value contains item, it works for string to check substring and for Array to check if array includes that item
+
+For testing async code:
+
+- `toResolve(value: any, strict = false)`
+Checks that the value is a promise and that it resolves, if a value is specified, than checks that it resolves in value, comparing using toEqual / toEqualStrict depending on **strict** argument
+
+- `toReject(value: any, strict = false)`
+Similar to **toResolve**
+
 
 And more:
 - `toBeDefined()`
@@ -65,6 +99,7 @@ And more:
 - `toBeNull()`
 - `toBeTruthy()`
 - `toBeNaN()`
+- `toBePromise()`
 
 Also, we support **not** keyword to build inversed tests, like this:
 ```js
@@ -72,8 +107,6 @@ expect(10).not.toBe(20)
 ```
 
 Above methods return *ExpectationResult*, with which test() function works natively. 
-If you just want to get boolean true / false, you could use any of that function preceded with underscore:  
-like  ```_toBe(value: any): boolean;```
 
 ```
 ExpectationResult {
