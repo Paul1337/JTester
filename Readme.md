@@ -2,6 +2,8 @@
 With support of run-time unit-testing.
 
 ## Getting started
+Installation: `npm i jtester`
+
 Basic example (one test in a block):
 ```js
 const { expect, test } = require('JTester');
