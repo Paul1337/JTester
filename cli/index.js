@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
-require('@babel/register');
+require('@babel/register')({
+    // presets: ['@babel/preset-env'],
+    plugins: [['@babel/plugin-transform-modules-commonjs']],
+});
 
 const { globSync } = require('glob');
 const JTester = require('../index.js');
