@@ -1,16 +1,30 @@
 # A simple node.js library for creating unit tests.
 
-With support of run-time unit-testing.
+With support of run-time unit-testing & development unit-testing
 
 ## Getting started
 
-Installation: `npm i jtester`
+Installation:
+
+```bash
+npm i jtester
+```
+
+## Run-time testing (as we call it)
 
 Basic example (one test in a block):
+
+_testFile.js_
 
 ```js
 const { expect, test } = require('JTester');
 test('Math', expect(2 * 2).toBe(4));
+```
+
+_to run tests as node.js script:_
+
+```bash
+node testFile.js
 ```
 
 or using es modules (type="module" or typecsript / webpack compilation)
@@ -62,6 +76,23 @@ test(
     asyncFunction().then((res) => expect(res).toBe('some res'))
 );
 ```
+
+## In-dev testing
+
+You can use jtester as a cli tool to test all files in directory that match pattern \*.test.js.
+All you need is to install cli globally and run it:
+
+```bash
+npm i --location=global jtester
+jtester
+```
+
+You can configurate path option (--path / -p) to look in the other directory, than the current one.
+You can use --help to see more details.
+
+-   CLI tool runs all those test files in one environment providing JTESTER API functions in global context by default
+-   You can use CJS or ESM module system in \*.test.js file, babel is used to handle import / export
+-   You are going to see global result of all your test files, so you don't need `afterAll(printResult)` as you needed in run-time testing
 
 ## API
 

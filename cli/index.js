@@ -15,24 +15,23 @@ program.name('JTester').description('CLI tool to run jtester unit tests');
 
 program
     .option('-p, --path <path>', 'Root path where to look for test files')
-    .option('-m, --module <mod>', 'Module system cjs / esm');
+    .option('-v, --verbose', 'To see more detailed logging on what cli does, where searches');
 
 program.parse();
 
 const options = program.opts();
 
-const moduleSystem = options.module ?? config.defaultModuleSystem;
 const inputPath = options.path ?? process.cwd();
 
 const pathType = inputPath.startsWith('/') ? 'absolute' : 'relative';
 
-console.log(`JTester runner started.. Input path = ${inputPath}`);
+if (options.verbose) console.log(`JTester runner started.. Input path = ${inputPath}`);
 const rootPath = pathType === 'absolute' ? inputPath : path.join(process.cwd(), inputPath);
 const resultPath = path.join(rootPath, '/**/*.test.js');
-console.log(`Search path = ${resultPath}`);
+if (options.verbose) console.log(`Search path = ${resultPath}`);
 
 const jsfiles = globSync(resultPath, { ignore: 'node_modules/**' });
-console.log(`Found ${jsfiles.length} js files:`, jsfiles);
+if (options.verbose) console.log(`Found ${jsfiles.length} js files:`, jsfiles);
 
 for (let method in JTester) {
     globalThis[method] = JTester[method];
