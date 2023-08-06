@@ -111,6 +111,14 @@ class Expectation {
         return isNaN(this.value);
     }
 
+    toBePromise() {
+        return new ExpectationResult(this._toBePromise(), this.value, 'to be a Promise');
+    }
+
+    _toBePromise() {
+        return this.value instanceof Promise;
+    }
+
     toHaveProperty(keyPath, value, strict = false) {
         return new ExpectationResult(
             this._toHaveProperty(keyPath, value, strict),
@@ -154,9 +162,7 @@ class Expectation {
     }
 
     toResolve(value, strict = false) {
-        if (!(this.value instanceof Promise)) {
-            throw new TypeError('Expectation value should be promise to check for resolving!');
-        }
+        if (!this._toBePromise()) return this.toBePromise();
         return this.value
             .then((resolveValue) => {
                 if (!value) return new ExpectationResult(true, this.value, 'to resolve');
@@ -169,9 +175,7 @@ class Expectation {
     }
 
     toReject(value, strict = false) {
-        if (!(this.value instanceof Promise)) {
-            throw new TypeError('Expectation value should be promise to check for rejecting!');
-        }
+        if (!this._toBePromise()) return this.toBePromise();
         return this.value
             .then(() => {
                 return new ExpectationResult(false, this.value, 'to reject');
