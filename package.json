@@ -3,6 +3,9 @@
     "version": "1.1.0",
     "description": "A tool for testing, with support of runtime testing",
     "main": "index.js",
+    "bin": {
+        "jtester": "./cli/index.js"
+    },
     "scripts": {
         "test": "node test/test.js"
     },
@@ -15,5 +18,15 @@
         "expect"
     ],
     "author": "",
-    "license": "ISC"
+    "license": "ISC",
+    "dependencies": {
+        "@babel/cli": "^7.22.9",
+        "@babel/core": "^7.22.9",
+        "@babel/plugin-transform-modules-commonjs": "^7.22.5",
+        "@babel/preset-env": "^7.22.9",
+        "@babel/register": "^7.22.5",
+        "colors": "^1.4.0",
+        "commander": "^11.0.0",
+        "glob": "^10.3.3"
+    }
 }

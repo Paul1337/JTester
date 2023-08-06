@@ -1,4 +1,7 @@
+const colors = require('colors');
 const ExpectationResult = require('./Expectation/ExpectationResult.js');
+
+colors.enable();
 
 const globalTests = {};
 let finishCallback = null;
@@ -51,7 +54,7 @@ const test = async (blockTitle, input) => {
     console.log(`JTesting finished: ${blockTitle}`);
     console.log(`Passed ${passed} of ${blockTests}`);
     const failed = blockTests - passed;
-    if (failed === 0) console.log('OK');
+    if (failed === 0) console.log(`${blockTitle}: OK`);
     else console.log(`Failed: ${failed} tests`);
 };
 
@@ -63,9 +66,11 @@ const printResult = () => {
         console.log(`Global JTesting intermediate result (Ran ${ran} tests):`);
     }
     const percent = ((globalTests.passed / globalTests.all) * 100).toFixed(2);
-    console.log(`Passed ${globalTests.passed} of ${globalTests.all} (${percent}%)`);
-    if (globalTests.failed === 0) console.log('OK');
-    else console.log(`Failed: ${globalTests.failed} tests`);
+    const OK = globalTests.failed === 0;
+    const cl = OK ? 'green' : 'red';
+    console.log(`Passed ${globalTests.passed} of ${globalTests.all} (${percent}%)`[cl]);
+    if (OK) console.log('All Ok'.green.underline);
+    else console.log(`Failed: ${globalTests.failed} tests`.red.underline);
 };
 
 const afterAll = (callback, delay = 0) => {
@@ -77,7 +82,7 @@ const afterAll = (callback, delay = 0) => {
 
 const onTestError = (err, testInfo = 'Test') => {
     globalTests.failed++;
-    console.log(`${testInfo}: ERROR ${err.message ? err.message : err}`);
+    console.log(`${testInfo}: ERROR ${err.message ? err.message : err}`.red);
     const allDone = globalTests.failed + globalTests.passed === globalTests.all;
     if (allDone && typeof finishCallback === 'function') finishCallback();
 };
@@ -86,10 +91,10 @@ const onTestRan = (expectationResult, testInfo = 'Test') => {
     const resultMsg = `${testInfo}: ${expectationResult.resultTxt}`;
     if (expectationResult.state === true) {
         globalTests.passed++;
-        console.log(resultMsg);
+        console.log(resultMsg.green);
     } else {
         globalTests.failed++;
-        console.error(resultMsg);
+        console.error(resultMsg.red);
     }
     const allDone = globalTests.failed + globalTests.passed === globalTests.all;
     if (allDone && typeof finishCallback === 'function') finishCallback();

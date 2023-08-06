@@ -20,14 +20,11 @@ class ExpectationResult {
     }
 
     formatValue(value) {
-        if (!value) return '';
+        if (value == undefined) return '';
         if (value instanceof Promise) {
             return '<Promise>';
         }
-        if (typeof value === 'object') {
-            return JSON.stringify(value);
-        }
-        return value;
+        return JSON.stringify(value);
     }
 
     get resultTxt() {

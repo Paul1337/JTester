@@ -1,0 +1,4 @@
+{
+    "maxFilesCnt": 1000,
+    "defaultModuleSystem": "cjs"
+}
