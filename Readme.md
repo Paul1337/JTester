@@ -54,7 +54,7 @@ test('Math', [
 ]);
 ```
 
-Library supports methods to work with async functions like **toResolve**, and **toReject**, but you can also pass *Promise* which returns **ExpectationResult** or rejects in the **test** function:
+Library supports methods to work with async functions like **toResolve**, and **toReject**, but you can also pass *Promise* which returns **ExpectationResult** or rejects like this:
 ```js
 test('some async', asyncFunction().then((res) => expect(res).toBe('some res')));
 ```
