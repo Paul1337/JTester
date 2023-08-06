@@ -75,13 +75,13 @@ Expectation methods:
 -   `toBeStrict(value: any)`  
     Strictly checks (like a '===' but considers NaN == NaN, using Object.is, but +0 will be considered equal to -0, in Object.is they are not)
 
--   `toEqual(value: any)`  
-    Actually compares 2 values, if objects - recursively iterating properties. For primitive properties uses toBe() to compare
+-   `toEqual(value: any, precision = 2)`  
+    Deeply compares 2 values, if objects - recursively iterating properties. For primitive properties uses toBe() to compare, except for the floating point numbers - for them uses toBeCloseTo with precision given in second argument
 
--   `toEqualStrict(value: any)`  
-    Actually compares 2 values, if objects - recursively iterating properties. For primitive properties uses toBeStrict() to compare
+-   `toEqualStrict(value: any, precision = 2)`  
+    Works like toEqual, except that for primitive properties uses **toBeStrict** to compare
 
--   `toBeCloseTo(value: number, digits = 2)`  
+-   `toBeCloseTo(value: number, precision = 2)`  
     Used to compare floating point numbers with precision given in the second agrument
 
 -   `toHaveProperty(keyPath: string, value: any, strict = false)`  
@@ -93,7 +93,7 @@ Expectation methods:
 For testing async code:
 
 -   `toResolve(value: any, strict = false)`
-    Checks that the value is a promise and that it resolves. If a value is specified, than checks that it resolves in value, comparing using toEqual / toEqualStrict depending on **strict** argument
+    Checks that the value is a promise and that it resolves. If the value is specified, than checks that it resolves in value, comparing using toEqual / toEqualStrict depending on **strict** argument
 
 -   `toReject(value: any, strict = false)`
     Similar to **toResolve**

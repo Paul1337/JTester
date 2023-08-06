@@ -1,5 +1,10 @@
 const ExpectationResult = require('./ExpectationResult.js');
 
+function isFloat(value) {
+    if (typeof value === 'number' && !Number.isNaN(value) && !Number.isInteger(value)) return true;
+    return false;
+}
+
 class Expectation {
     constructor(value) {
         this.value = value;
@@ -44,20 +49,21 @@ class Expectation {
         return Object.is(this.value, value);
     }
 
-    toEqual(value) {
-        return new ExpectationResult(this._toEqual(value), this.value, 'to equal', value);
+    toEqual(value, precision) {
+        return new ExpectationResult(this._toEqual(value, precision), this.value, 'to equal', value);
     }
 
-    _toEqual(value) {
-        return this._toEqualGeneric(value, this._toBe);
+    _toEqual(value, precision) {
+        return this._toEqualGeneric(value, this._toBe, precision);
     }
 
-    toEqualStrict(value) {
-        return new ExpectationResult(this._toEqualStrict(value), this.value, 'to equal strict', value);
+    toEqualStrict(value, precision) {
+        const action = 'to equal strict';
+        return new ExpectationResult(this._toEqualStrict(value, precision), this.value, action, value);
     }
 
-    _toEqualStrict(value) {
-        return this._toEqualGeneric(value, this._toBeStrict);
+    _toEqualStrict(value, precision) {
+        return this._toEqualGeneric(value, this._toBeStrict, precision);
     }
 
     toBeCloseTo(value, numDigits = 2) {
@@ -141,7 +147,7 @@ class Expectation {
         else return new Expectation(cur)._toEqualStrict(value);
     }
 
-    _toEqualGeneric(value, cmpFn) {
+    _toEqualGeneric(value, cmpFn, precision) {
         if (this.value == undefined || value == undefined) {
             return cmpFn.call(this, value);
         }
@@ -151,12 +157,15 @@ class Expectation {
                 const compVal = value[property];
 
                 const expectObj = new Expectation(propVal);
-                if (!expectObj._toEqualGeneric(compVal, cmpFn)) {
+                if (!expectObj._toEqualGeneric(compVal, cmpFn, precision)) {
                     return false;
                 }
             }
             return true;
         } else {
+            if (isFloat(this.value) && isFloat(value)) {
+                return this._toBeCloseTo(value, precision);
+            }
             return cmpFn.call(this, value);
         }
     }
