@@ -17,7 +17,7 @@ Basic example (one test in a block):
 _testFile.js_
 
 ```js
-const { expect, test } = require('JTester');
+const { expect, test } = require('jtester');
 test('Math', expect(2 * 2).toBe(4));
 ```
 
@@ -30,7 +30,7 @@ node testFile.js
 or using es modules (type="module" or typecsript / webpack compilation)
 
 ```js
-import { expect, test } from 'JTester';
+import { expect, test } from 'jtester';
 test('Math', expect(2 * 2).toBe(4));
 ```
 
