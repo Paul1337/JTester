@@ -37,7 +37,11 @@ test('Math', expect(2 * 2).toBe(4));
 Several tests in a named block:
 
 ```js
-test('Math', [expect(2 * 2).toBe(4), expect(5 - 3).toBe(2), expect(0.4 + 0.2).toBeCloseTo(0.6)]);
+test('Math', [
+    expect(2 * 2).toBe(4), // prettier-ignore
+    expect(5 - 3).toBe(2),
+    expect(0.4 + 0.2).toBeCloseTo(0.6),
+]);
 ```
 
 Printing global result:
