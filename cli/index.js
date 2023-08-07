@@ -69,8 +69,12 @@ if (config.block) {
     globalThis.BLOCK_TITLE = config.block;
 }
 
+if (config.before && typeof config.before === 'function') config.before();
+
 for (let file of jsfiles) {
     require(file);
 }
+
+if (config.after && typeof config.after === 'function') config.after();
 
 JTester.afterAll(JTester.printResult);

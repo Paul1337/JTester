@@ -94,6 +94,21 @@ You can use --help to see more details.
 -   You can use CJS or ESM module system in \*.test.js file, babel is used to handle import / export
 -   You are going to see global result of all your test files, so you don't need `afterAll(printResult)` as you needed in run-time testing
 
+# Configuration
+
+Configuration is for cli tool.
+There is a default configuration, which is used when you run `jsteter` without params.
+You can override it by _jtester.config.js_ which should export config object (in cjs or esm as you like).
+That file should be located in the place where you run `jtester`.
+And that configuration may be overriden by cli options (highest priority).
+
+-   Every option in cli command is described in --help and any of that option can be used in jtester.config.js file
+-   In jtester.config.js file there are some extra options available:
+
+*   `globalContext: object` - An object in which you can put anything you want to be accessable globally in your .test.js files
+*   `before: function` - A hook, that is executed just before running test files
+*   `after: function` - A hook, that is executed just after running test files
+
 ## API
 
 `expect(value: any) => Expectation;`
