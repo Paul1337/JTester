@@ -94,7 +94,7 @@ You can use --help to see more details.
 -   You can use CJS or ESM module system in \*.test.js file, babel is used to handle import / export
 -   You are going to see global result of all your test files, so you don't need `afterAll(printResult)` as you needed in run-time testing
 
-# Configuration
+## Configuration
 
 Configuration is for cli tool.
 There is a default configuration, which is used when you run `jsteter` without params.

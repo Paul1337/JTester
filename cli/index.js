@@ -14,12 +14,12 @@ const fs = require('fs');
 
 let config = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'defaultConfig.json')), 'utf-8');
 
-const customConfigPath = path.join(process.cwd(), 'jtester.config.json');
+const customConfigPath = path.join(process.cwd(), 'jtester.config.js');
 if (fs.existsSync(customConfigPath)) {
     const customConfig = require(customConfigPath);
     config = {
         ...config,
-        ...customConfig,
+        ...(customConfig.default ?? customConfig),
     };
 }
 
