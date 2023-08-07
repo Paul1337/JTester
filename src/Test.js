@@ -51,11 +51,11 @@ const test = async (blockTitle, input) => {
 
     await Promise.all(promises);
 
-    console.log(`JTesting finished: ${blockTitle}`);
-    console.log(`Passed ${passed} of ${blockTests}`);
-    const failed = blockTests - passed;
-    if (failed === 0) console.log(`${blockTitle}: OK`);
-    else console.log(`Failed: ${failed} tests`);
+    // console.log(`JTesting finished: ${blockTitle}`);
+    console.log(`${blockTitle} result: ${passed} of ${blockTests}`);
+    // const failed = blockTests - passed;
+    // if (failed === 0) console.log(`${blockTitle}: OK`);
+    // else console.log(`Failed: ${failed} tests`);
 };
 
 const printResult = () => {
