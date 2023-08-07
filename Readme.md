@@ -48,7 +48,11 @@ Printing global result:
 
 ```js
 import { expect, test, afterAll, printResult } from 'JTester';
-test('Math', [expect(2 * 2).toBe(4), expect(5 - 3).toBe(2), expect(0.4 + 0.2).toBeCloseTo(0.6)]);
+test('Math', [
+    expect(2 * 2).toBe(4), 
+    expect(5 - 3).toBe(2), 
+    expect(0.4 + 0.2).toBeCloseTo(0.6)
+]);
 afterAll(printResult);
 ```
 
