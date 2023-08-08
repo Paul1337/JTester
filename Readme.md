@@ -136,7 +136,7 @@ export default {
     globalContext: { // add something to global context in *.test.js files
         SOME_GLOBAL_VARIABLE: 'test'
     },
-    file: 'math.test.js' // test specifig file
+    file: 'math.test.js' // test specific file
 };
 
 ```
