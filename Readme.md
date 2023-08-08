@@ -141,7 +141,6 @@ export default {
 
 ```
 
-
 ## API
 
 `expect(value: any) => Expectation;`
