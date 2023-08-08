@@ -95,6 +95,12 @@ npm i --location=global jtester
 jtester
 ```
 
+```js
+// example.test.js
+// no need to require jtester api in those files
+test('string lowercase', expect('jTeSter'.toLowerCase()).toBe('jtester'));
+```
+
 You can configurate path option (--path / -p) to look in the other directory, than the current one.
 You can use --help to see more details.
 
@@ -111,11 +117,30 @@ That file should be located in the place where you run `jtester`.
 And that configuration may be overriden by cli options (highest priority).
 
 -   Every option in cli command is described in --help and any of that option can be used in jtester.config.js file
--   In jtester.config.js file there are some extra options available:
 
-*   `globalContext: object` - An object in which you can put anything you want to be accessable globally in your .test.js files
-*   `before: function` - A hook, that is executed just before running test files
-*   `after: function` - A hook, that is executed just after running test files
+**In jtester.config.js file there are some extra options available:**  
+
+`globalContext: object` - An object in which you can put anything you want to be accessable globally in your .test.js files  
+`before: function` - A hook, that is executed just before running test files  
+`after: function` - A hook, that is executed just after running test files  
+
+Example:  
+
+```js
+// jtester.config.js
+export default {
+    before: () => {
+        // do something before testing
+    },
+    verbose: true, // show additional information when seaching *.test.js files
+    globalContext: { // add something to global context in *.test.js files
+        SOME_GLOBAL_VARIABLE: 'test'
+    },
+    file: 'math.test.js' // test specifig file
+};
+
+```
+
 
 ## API
 
