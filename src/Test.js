@@ -91,7 +91,7 @@ const onTestRan = (expectationResult, testInfo = 'Test') => {
         console.log(colors.green(resultMsg));
     } else {
         globalTests.failed++;
-        console.error(colors.red(resultMsg));
+        console.log(colors.red(resultMsg));
     }
     const allDone = globalTests.failed + globalTests.passed === globalTests.all;
     if (allDone && typeof finishCallback === 'function') finishCallback();

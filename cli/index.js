@@ -58,6 +58,7 @@ if (config.verbose) console.log(`Found ${jsfiles.length} js files:`, jsfiles);
 for (let prop in JTester) {
     globalThis[prop] = JTester[prop];
 }
+globalThis.JTESTER_GLOBALLY = true;
 
 if (config.globalContext && typeof config.globalContext === 'object') {
     for (let prop in config.globalContext) {
