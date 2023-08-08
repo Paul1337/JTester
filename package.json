@@ -28,5 +28,13 @@
         "colors": "^1.4.0",
         "commander": "^11.0.0",
         "glob": "^10.3.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Paul1337/JTester/tree/main"
+    },
+    "homepage": "https://github.com/Paul1337/JTester/tree/main",
+    "bugs": {
+        "url": "https://github.com/Paul1337/JTester/issues"
     }
 }
