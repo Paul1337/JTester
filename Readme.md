@@ -10,8 +10,11 @@ Random example to take a brief look:
 
 test('Parser', () => {
     test('tokenization', () => {
-        expect('this is jtester').toEqual(['this', 'is', 'jtester']).described('Splitting words');
-        expect(someParser.tokenize('jtester, ok')).toEqual(['jtester', 'ok']).described('Splitting by comma');
+        expect(someParser.tokenize('this is jtester')).toEqual(['this', 'is', 'jtester'])
+                                                      .described('Splitting words');
+
+        expect(someParser.tokenize('jtester, ok')).toEqual(['jtester', 'ok'])
+                                                  .described('Splitting by comma');
     });
 
     test('parsing tokens', expect(someParser.parseTokens(someTokens)).toEqual(something));
