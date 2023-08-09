@@ -5,6 +5,7 @@ class ExpectationResult {
         this.expected = expected;
         this.expectAction = expectAction;
         this.isInversed = false;
+        this.description = '';
     }
 
     get stateStr() {
@@ -34,6 +35,11 @@ class ExpectationResult {
             const inv = this.isInversed ? 'not ' : '';
             return `${this.stateStr} - Expected ${this.recievedFormatted} ${inv}${this.expectAction} ${this.expectedFormatted}`;
         }
+    }
+
+    described(description) {
+        this.description = description;
+        return this;
     }
 
     inversed() {

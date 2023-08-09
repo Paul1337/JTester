@@ -1,7 +1,5 @@
-const Expectation = require('./src/Expectation/Expectation.js');
+const { expect } = require('./src/Expectation/Expectation.js');
 const testModule = require('./src/Test.js');
-
-const expect = (value) => new Expectation(value);
 
 if (globalThis.JTESTER_GLOBALLY) {
     exports.expect = globalThis.expect;

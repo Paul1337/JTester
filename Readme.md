@@ -1,13 +1,34 @@
 # A simple node.js library for creating unit tests.
 
-With support of run-time unit-testing & development unit-testing
+## About
+
+This library is aimed to be as simple as possible in terms of unit testing and provide some opportunities and flexibility. Even though it is simple we want it to be able to handle testing for apps of any kind and scale.  
+There are 2 ways of using package: run-time testing in node.js environment & in-development testing using as CLI tool.  
+
+Random example to take a brief look:
+```js
+
+test('Parser', () => {
+    test('tokenization', () => {
+        expect('this is jtester').toEqual(['this', 'is', 'jtester']).described('Splitting words');
+        expect(someParser.tokenize('jtester, ok')).toEqual(['jtester', 'ok']).described('Splitting by comma');
+    });
+
+    test('parsing tokens', expect(someParser.parseTokens(someTokens)).toEqual(something));
+});
+
+```
+Our tests are created with **test()** functions, which may be used for a block of test or just for one test.  
+You can build hierarchy of those tests as you like to make it semantically correct for your case and to provide functional scope for each of them.
+Or you can stay with more simplified syntax, passing an array of just expect() to the test function - that may be enough depending on your case.
+You can read that in our small documentation below.
 
 ## Getting started
 
 Installation:
 
 ```bash
-npm i jtester
+npm i -D jtester
 ```
 
 ## Run-time testing (as we call it)
@@ -21,7 +42,7 @@ const { expect, test } = require('jtester');
 test('Math', expect(2 * 2).toBe(4));
 ```
 
-_to run tests as node.js script:_
+_Then you can run test file in node.js environment:_
 
 ```bash
 node testFile.js
@@ -44,7 +65,8 @@ test('Math', [
 ]);
 ```
 
-Printing global result:
+Printing global result (of all test blocks) you can use **afterAll(callback, delay=0)** with **printResult** API:  
+*Note: afterAll() should be in the end (after all tests are registered with test() function). It will wait for all the async tests to finish.*
 
 ```js
 import { expect, test, afterAll, printResult } from 'JTester';
@@ -74,7 +96,40 @@ test('Math', [
     expect(2 * 2).toBe(4), // [expect(2 * 2).toBe(4)] would also be valid
     ['Adding float numbers', expect(0.4 + 0.2).toBeCloseTo(0.6)],
 ]);
+// also like this
+test('Math', [
+    expect(2 * 2).toBe(4), 
+    expect(0.4 + 0.2).toBeCloseTo(0.6).described('Adding float numbers'),
+]);
 ```
+
+Actually, you can pass a function as the second argument.  
+That is convinient when tests have their own scope and do some calculations - you can put them in that function.
+
+*ExpectationResult is what it returned from expect().to<something> function*
+
+```js
+test('Functional block', () => {
+    const four = 4, five = 5;
+    expect(four).toBe(4); 
+    expect(five).toBe(5).described('Some description if needed'); 
+});
+```
+
+And actually, you can put tests inside tests building semantic tree like this:
+```js
+test('Functional block', () => {
+    const four = 4, five = 5;
+    expect(four).toBe(4); 
+    test('Another block for 5', () => {
+        expect(five).toBe(5).described('Some description if needed');         
+    });
+});
+```
+This way you will be seeing logging in another format, due to the heirarhy of tests and total result will only be displayed for top level blocks, not for all of them.  
+Also, titles of blocks should be unique in the their scope, otherwise you will get an error.
+
+When using function as the second argument you can describe tests using **described(text)** method shown above.
 
 Library supports methods to work with async functions like **toResolve**, and **toReject**, but you can also pass _Promise_ which returns **ExpectationResult** or rejects like this:
 
@@ -104,7 +159,7 @@ test('string lowercase', expect('jTeSter'.toLowerCase()).toBe('jtester'));
 You can configurate path option (--path / -p) to look in the other directory, than the current one.
 You can use --help to see more details.
 
--   CLI tool runs all those test files in one environment providing JTESTER API functions in global context by default
+-   CLI tool runs all those test files in one environment providing JTESTER API functions in global context by default, but if you want you can import them explicitly
 -   You can use CJS or ESM module system in \*.test.js file, babel is used to handle import / export
 -   You are going to see global result of all your test files, so you don't need `afterAll(printResult)` as you needed in run-time testing
 
@@ -191,14 +246,4 @@ Also, we support **not** keyword to build inversed tests, like this:
 expect(10).not.toBe(20);
 ```
 
-Above methods return _ExpectationResult_, with which test() function works natively.
-
-```
-ExpectationResult {
-  state: boolean;
-  recieved: any;
-  expected: any;
-  expectAction: string;
-  isInversed: boolean;
-}
-```
+Above methods return **ExpectationResult**, with which test() function works natively.

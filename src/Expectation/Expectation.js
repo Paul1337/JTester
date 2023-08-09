@@ -1,3 +1,4 @@
+const { isTestProp } = require('../utils.js');
 const ExpectationResult = require('./ExpectationResult.js');
 
 function isFloat(value) {
@@ -6,14 +7,15 @@ function isFloat(value) {
 }
 
 class Expectation {
-    constructor(value) {
+    constructor(value, expResultStore) {
         this.value = value;
+        this.expResultStore = expResultStore;
     }
 
     get not() {
         return new Proxy(this, {
             get(target, prop, receiver) {
-                if (target[prop] instanceof Function) {
+                if (isTestProp(target, prop)) {
                     const res = target[prop];
                     return (value) => res.call(target, value).inversed();
                 }
@@ -197,4 +199,5 @@ class Expectation {
     }
 }
 
-module.exports = Expectation;
+module.exports.Expectation = Expectation;
+module.exports.expect = (value) => new Expectation(value);
