@@ -1,6 +1,6 @@
 # A simple node.js library for creating unit tests.
 
-## About
+## About  
 
 This library is aimed to be as simple as possible in terms of unit testing and provide some opportunities and flexibility. Even though it is simple we want it to be able to handle testing for apps of any kind and scale.  
 There are 2 ways of using package: run-time testing in node.js environment & in-development testing using as CLI tool.  
