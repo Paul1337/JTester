@@ -104,7 +104,7 @@ const test = async (blockTitle, input, parent) => {
     if (blockTests === 0) return;
 
     for (let testKey in tests) {
-        const test = tests[testKey];
+        let test = tests[testKey];
         if (!test) continue;
         let testName = isNaN(testKey) ? testKey : Number(testKey) + 1;
         if (test.description) testName = test.description;
