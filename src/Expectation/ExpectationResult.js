@@ -13,6 +13,7 @@ class ExpectationResult {
     }
 
     get recievedFormatted() {
+        if (this.recieved == undefined) return JSON.stringify(this.recieved);
         return this.formatValue(this.recieved);
     }
 

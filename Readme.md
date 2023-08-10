@@ -8,12 +8,12 @@ There are 2 ways of using package: run-time testing in node.js environment & in-
 Random example to take a brief look:
 ```js
 
-test('Parser', () => {
-    test('tokenization', () => {
-        expect(someParser.tokenize('this is jtester'))
+test('Parser', (env) => {
+    env.test('tokenization', (env) => {
+        env.expect(someParser.tokenize('this is jtester'))
             .toEqual(['this', 'is', 'jtester'])
             .described('Splitting words');
-        expect(someParser.tokenize('jtester, ok'))
+        env.expect(someParser.tokenize('jtester, ok'))
             .toEqual(['jtester', 'ok'])
             .described('Splitting by comma');
     });
@@ -108,23 +108,24 @@ test('Math', [
 ```
 
 Actually, you can pass a function as the second argument.  
-That is convinient when tests have their own scope and do some calculations - you can put them in that function.
+In that case you need to get **env** object passed to the function and use its *expect* and *test*.
+Alternatively, you can use this.expect / this.test, but then you have can't use arrow function syntax.
 
 ```js
-test('Functional block', () => {
+test('Functional block', (env) => {
     const four = 4, five = 5;
-    expect(four).toBe(4); 
-    expect(five).toBe(5).described('Some description if needed'); 
+    env.expect(four).toBe(4); 
+    env.expect(five).toBe(5).described('Some description if needed'); 
 });
 ```
 
 And actually, you can put tests inside tests building semantic tree like this:
 ```js
-test('Functional block', () => {
+test('Functional block', (env) => {
     const four = 4, five = 5;
-    expect(four).toBe(4); 
-    test('Another block for 5', () => {
-        expect(five).toBe(5).described('Some description if needed');         
+    env.expect(four).toBe(4); 
+    env.test('Another block for 5', (env) => {
+        env.expect(five).toBe(5).described('Some description if needed');         
     });
 });
 ```

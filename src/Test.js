@@ -36,15 +36,7 @@ const buildHookedExpectation = (value) => {
 
 const testsMap = new Map();
 
-const getAbsoluteBlockTitle = (upperBlocks, blockTitle) =>
-    upperBlocks.concat(blockTitle || []).join(' > ');
-
-const registerNewTest = (testAbsoluteTitle, upperBlocks = []) => {
-    let parent = null;
-    if (upperBlocks.length > 0) {
-        const title = getAbsoluteBlockTitle(upperBlocks);
-        parent = testsMap.get(title) || null;
-    }
+const registerNewTest = (testAbsoluteTitle, parent) => {
     const newTest = {
         title: testAbsoluteTitle,
         finishedElements: 0,
@@ -54,9 +46,8 @@ const registerNewTest = (testAbsoluteTitle, upperBlocks = []) => {
         allInnerTests: 0,
     };
     testsMap.set(testAbsoluteTitle, newTest);
-    if (parent) {
-        parent.elements.push(newTest);
-    }
+    if (parent) parent.elements.push(newTest);
+    return newTest;
 };
 
 const finishTest = (test, passed, blockTests) => {
@@ -74,17 +65,13 @@ const finishTest = (test, passed, blockTests) => {
     }
 };
 
-const scope = (expect, test, code) => {
-    eval(code);
-};
-
-const test = async (blockTitle, input, upperBlocks = []) => {
+const test = async (blockTitle, input, parent) => {
     if (finishCallback) {
         const msg = `Could not run test "${blockTitle}" because finishCallback is already set. You can only use afterAll(callback) after the tests.`;
         throw new Error(msg);
     }
 
-    const testAbsoluteTitle = getAbsoluteBlockTitle(upperBlocks, blockTitle);
+    const testAbsoluteTitle = parent ? `${parent.title} > ${blockTitle}` : blockTitle;
     if (testsMap.has(testAbsoluteTitle)) {
         const msg = `Attempt to run test with duplicate name "${testAbsoluteTitle}"`;
         throw new Error(msg);
@@ -92,27 +79,20 @@ const test = async (blockTitle, input, upperBlocks = []) => {
 
     if (globalThis.BLOCK_TITLE && globalThis.BLOCK_TITLE !== blockTitle) return;
 
-    registerNewTest(testAbsoluteTitle, upperBlocks);
-    if (upperBlocks.length === 0) console.log(`JTesting started: ${blockTitle}`);
+    const testObject = registerNewTest(testAbsoluteTitle, parent);
+    if (!parent) console.log(`JTesting started: ${blockTitle}`);
     let passed = 0;
     let tests = [];
 
     if (typeof input === 'function') {
-        const fnContent = input.toString().trim();
-        const matches = fnContent.match(/^\s*(function\s+\w*\s*\([^)]*\)\s*{)|(\([^)]*\)\s*=>\s*{)/);
-        const firstMatch = matches[0];
-        const ind = firstMatch.length;
-        const code = fnContent.substring(ind, fnContent.length - 1);
         const expect = (value) => {
             const expectObject = buildHookedExpectation(value);
             expectObject.onTestCall = (expResult) => tests.push(expResult);
             return expectObject;
         };
-        const test = (_blockTitle, _input) => {
-            globalThis.test(_blockTitle, _input, (upperBlocks ?? []).concat(blockTitle));
-        };
-        // eval(code);
-        scope(expect, test, code);
+        const test = (_blockTitle, _input) => globalThis.test(_blockTitle, _input, testObject);
+        const context = { expect, test };
+        input.call(context, context);
     } else {
         tests = input instanceof ExpectationResult || input instanceof Promise ? [input] : input;
     }
@@ -124,7 +104,8 @@ const test = async (blockTitle, input, upperBlocks = []) => {
     if (blockTests === 0) return;
 
     for (let testKey in tests) {
-        let test = tests[testKey];
+        const test = tests[testKey];
+        if (!test) continue;
         let testName = isNaN(testKey) ? testKey : Number(testKey) + 1;
         if (test.description) testName = test.description;
         if (Array.isArray(test)) {
