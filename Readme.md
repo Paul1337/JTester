@@ -110,8 +110,6 @@ test('Math', [
 Actually, you can pass a function as the second argument.  
 That is convinient when tests have their own scope and do some calculations - you can put them in that function.
 
-*ExpectationResult is what it returned from expect().to<something> function*
-
 ```js
 test('Functional block', () => {
     const four = 4, five = 5;
@@ -130,7 +128,7 @@ test('Functional block', () => {
     });
 });
 ```
-This way you will be seeing logging in another format, due to the heirarhy of tests and total result will only be displayed for top level blocks, not for all of them.  
+This way you will be seeing logging in another format, due to the heirarhy of tests and total result will only be displayed for top level blocks, aggregating all inner tests. Not for every block.  
 Also, titles of blocks should be unique in the their scope, otherwise you will get an error.
 
 When using function as the second argument you can describe tests using **described(text)** method shown above.
@@ -171,7 +169,7 @@ You can use --help to see more details.
 
 Configuration is for cli tool.
 There is a default configuration, which is used when you run `jsteter` without params.
-You can override it by _jtester.config.js_ which should export config object (in cjs or esm as you like).
+You can override it by _jtester.config.js_ which should export default config object (in cjs or esm as you like).
 That file should be located in the place where you run `jtester`.
 And that configuration may be overriden by cli options (highest priority).
 
