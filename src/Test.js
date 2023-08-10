@@ -74,6 +74,10 @@ const finishTest = (test, passed, blockTests) => {
     }
 };
 
+const scope = (expect, test, code) => {
+    eval(code);
+};
+
 const test = async (blockTitle, input, upperBlocks = []) => {
     if (finishCallback) {
         const msg = `Could not run test "${blockTitle}" because finishCallback is already set. You can only use afterAll(callback) after the tests.`;
@@ -107,7 +111,8 @@ const test = async (blockTitle, input, upperBlocks = []) => {
         const test = (_blockTitle, _input) => {
             globalThis.test(_blockTitle, _input, (upperBlocks ?? []).concat(blockTitle));
         };
-        eval(code);
+        // eval(code);
+        scope(expect, test, code);
     } else {
         tests = input instanceof ExpectationResult || input instanceof Promise ? [input] : input;
     }
@@ -150,10 +155,6 @@ const test = async (blockTitle, input, upperBlocks = []) => {
 
     await Promise.all(promises);
     finishTest(testsMap.get(testAbsoluteTitle), passed, blockTests);
-    // if (upperBlocks.length === 0) {
-    //     const resultTxt = `${blockTitle} result: ${passed} of ${blockTests}`;
-    //     console.log(passed < blockTests ? colors.yellow(resultTxt) : resultTxt);
-    // }
 };
 
 const printResult = () => {
