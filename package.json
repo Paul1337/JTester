@@ -2,7 +2,7 @@
     "name": "jtester",
     "version": "3.0.7",
     "description": "A tool for testing, with support of runtime testing",
-    "main": "index.js",
+    "main": "src/index.js",
     "bin": {
         "jtester": "./cli/index.js"
     },

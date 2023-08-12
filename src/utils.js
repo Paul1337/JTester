@@ -1,3 +1,8 @@
-module.exports.isTestProp = (expectation, prop) => {
-    return typeof expectation[prop] === 'function' && prop.startsWith('to');
+module.exports = {
+    formatBlockTitle(blockTitle) {
+        return blockTitle
+            .split('>')
+            .map((bit) => bit.trim())
+            .join(' > ');
+    },
 };

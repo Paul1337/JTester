@@ -22,7 +22,8 @@ test('Parser', (env) => {
 });
 
 ```
-Our tests are created with **test()** functions, which may be used for a block of test or just for one test.  
+Our tests are created with **test()** functions, which may be used for a block of test or just for one test.
+In these functions you can use **expect** to describe microtests.
 You can build hierarchy of those tests as you like to make it semantically correct for your case and to provide functional scope for each of them.
 Or you can stay with more simplified syntax, passing an array of just expect() to the test function - that may be enough depending on your case.
 You can read that in our small documentation below.
@@ -82,7 +83,7 @@ test('Math', [
 afterAll(printResult);
 ```
 
-If you want to describe each test in a block, you can do it several ways:
+If you want to describe each microtest in a block, you can do it several ways:
 
 ```js
 // passing object

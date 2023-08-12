@@ -6,11 +6,12 @@ require('@babel/register')({
 });
 
 const { globSync } = require('glob');
-const JTester = require('../index.js');
+const JTester = require('../src/index.js');
 const { program } = require('commander');
 
 const path = require('path');
 const fs = require('fs');
+const utils = require('../src/utils.js');
 
 let config = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'defaultConfig.json')), 'utf-8');
 
@@ -29,8 +30,8 @@ program
     .option('-v, --verbose', 'To see more detailed logging on what cli does, where searches')
     .option('-f, --file <file>', 'To test only specific file')
     .option(
-        '-b, --block <block>',
-        'To run only specific test block (block name is the first argument of test() function)'
+        '-b, --test <test>',
+        'To run only specific test by absolute title (title should be in format "some > inner > inner2")'
     );
 
 program.parse();
@@ -66,8 +67,9 @@ if (config.globalContext && typeof config.globalContext === 'object') {
     }
 }
 
-if (config.block) {
-    globalThis.BLOCK_TITLE = config.block;
+if (config.test) {
+    globalThis.TEST_TITLE = utils.formatBlockTitle(config.test);
+    if (config.verbose) console.log(`Looking for test: ${globalThis.TEST_TITLE}`);
 }
 
 if (config.before && typeof config.before === 'function') config.before();

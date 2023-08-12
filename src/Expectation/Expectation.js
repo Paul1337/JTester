@@ -7,25 +7,27 @@ function isFloat(value) {
 }
 
 class Expectation {
-    constructor(value, expResultStore) {
+    constructor(value) {
         this.value = value;
-        this.expResultStore = expResultStore;
+        this.isInversed = false;
     }
 
     get not() {
-        return new Proxy(this, {
-            get(target, prop, receiver) {
-                if (isTestProp(target, prop)) {
-                    const res = target[prop];
-                    return (value) => res.call(target, value).inversed();
-                }
-                return target[prop];
-            },
-        });
+        const newExpectation = new Expectation(this.value);
+        newExpectation.isInversed = true;
+        return newExpectation;
+    }
+
+    handleResult(result) {
+        const totalResult = this.isInversed ? result.inversed() : result;
+        if (this.onTestCall) this.onTestCall(totalResult);
+        return totalResult;
     }
 
     toContain(item) {
-        return new ExpectationResult(this._toContain(item), this.value, 'to contain', item);
+        return this.handleResult(
+            new ExpectationResult(this._toContain(item), this.value, 'to contain', item)
+        );
     }
 
     _toContain(item) {
@@ -35,7 +37,7 @@ class Expectation {
     }
 
     toBe(value) {
-        return new ExpectationResult(this._toBe(value), this.value, 'to be', value);
+        return this.handleResult(new ExpectationResult(this._toBe(value), this.value, 'to be', value));
     }
 
     _toBe(value) {
@@ -43,7 +45,9 @@ class Expectation {
     }
 
     toBeStrict(value) {
-        return new ExpectationResult(this._toBeStrict(value), this.value, 'to be strict', value);
+        return this.handleResult(
+            new ExpectationResult(this._toBeStrict(value), this.value, 'to be strict', value)
+        );
     }
 
     _toBeStrict(value) {
@@ -52,7 +56,9 @@ class Expectation {
     }
 
     toEqual(value, precision) {
-        return new ExpectationResult(this._toEqual(value, precision), this.value, 'to equal', value);
+        return this.handleResult(
+            new ExpectationResult(this._toEqual(value, precision), this.value, 'to equal', value)
+        );
     }
 
     _toEqual(value, precision) {
@@ -61,7 +67,9 @@ class Expectation {
 
     toEqualStrict(value, precision) {
         const action = 'to equal strict';
-        return new ExpectationResult(this._toEqualStrict(value, precision), this.value, action, value);
+        return this.handleResult(
+            new ExpectationResult(this._toEqualStrict(value, precision), this.value, action, value)
+        );
     }
 
     _toEqualStrict(value, precision) {
@@ -70,7 +78,9 @@ class Expectation {
 
     toBeCloseTo(value, numDigits = 2) {
         const action = 'to be close to';
-        return new ExpectationResult(this._toBeCloseTo(value, numDigits), this.value, action, value);
+        return this.handleResult(
+            new ExpectationResult(this._toBeCloseTo(value, numDigits), this.value, action, value)
+        );
     }
 
     _toBeCloseTo(value, numDigits = 2) {
@@ -80,7 +90,9 @@ class Expectation {
     }
 
     toBeDefined() {
-        return new ExpectationResult(this._toBeDefined(), this.value, 'to be defined');
+        return this.handleResult(
+            new ExpectationResult(this._toBeDefined(), this.value, 'to be defined')
+        );
     }
 
     _toBeDefined() {
@@ -88,7 +100,9 @@ class Expectation {
     }
 
     toBeUndefined() {
-        return new ExpectationResult(this._toBeUndefined(), this.value, 'to be undefined');
+        return this.handleResult(
+            new ExpectationResult(this._toBeUndefined(), this.value, 'to be undefined')
+        );
     }
 
     _toBeUndefined() {
@@ -96,7 +110,7 @@ class Expectation {
     }
 
     toBeNull() {
-        return new ExpectationResult(this._toBeNull(), this.value, 'to be null');
+        return this.handleResult(new ExpectationResult(this._toBeNull(), this.value, 'to be null'));
     }
 
     _toBeNull() {
@@ -104,7 +118,7 @@ class Expectation {
     }
 
     toBeTruthy() {
-        return new ExpectationResult(this._toBeTruthy(), this.value, 'to be truthy');
+        return this.handleResult(new ExpectationResult(this._toBeTruthy(), this.value, 'to be truthy'));
     }
 
     _toBeTruthy() {
@@ -112,7 +126,7 @@ class Expectation {
     }
 
     toBeNaN() {
-        return new ExpectationResult(this._toBeNaN(), this.value, 'to be NaN');
+        return this.handleResult(new ExpectationResult(this._toBeNaN(), this.value, 'to be NaN'));
     }
 
     _toBeNaN() {
@@ -120,7 +134,9 @@ class Expectation {
     }
 
     toBePromise() {
-        return new ExpectationResult(this._toBePromise(), this.value, 'to be a Promise');
+        return this.handleResult(
+            new ExpectationResult(this._toBePromise(), this.value, 'to be a Promise')
+        );
     }
 
     _toBePromise() {
@@ -128,12 +144,14 @@ class Expectation {
     }
 
     toHaveProperty(keyPath, value, strict = false) {
-        return new ExpectationResult(
-            this._toHaveProperty(keyPath, value, strict),
-            this.value,
-            `to have property ${keyPath} ${
-                value ? 'and equal ' + (strict ? 'strict' : '"') + value + '"' : ''
-            }`
+        return this.handleResult(
+            new ExpectationResult(
+                this._toHaveProperty(keyPath, value, strict),
+                this.value,
+                `to have property ${keyPath} ${
+                    value ? 'and equal ' + (strict ? 'strict' : '"') + value + '"' : ''
+                }`
+            )
         );
     }
 
@@ -174,30 +192,41 @@ class Expectation {
 
     toResolve(value, strict = false) {
         if (!this._toBePromise()) return this.toBePromise();
-        return this.value
-            .then((resolveValue) => {
-                if (!value) return new ExpectationResult(true, this.value, 'to resolve');
-                const expectation = new Expectation(resolveValue);
-                return strict ? expectation.toEqualStrict(value) : expectation.toEqual(value);
-            })
-            .catch(() => {
-                return new ExpectationResult(false, this.value, 'to resolve');
-            });
+
+        return this.handleResult(
+            new ExpectationResult(
+                this.value.then(
+                    (resolveValue) => {
+                        if (!value) return true;
+                        const expectation = new Expectation(resolveValue);
+                        return strict ? expectation.toEqualStrict(value) : expectation.toEqual(value);
+                    },
+                    (rejectValue) => false
+                ),
+                this.value,
+                'to resolve'
+            )
+        );
     }
 
     toReject(value, strict = false) {
         if (!this._toBePromise()) return this.toBePromise();
-        return this.value
-            .then(() => {
-                return new ExpectationResult(false, this.value, 'to reject');
-            })
-            .catch((rejectValue) => {
-                if (!value) return new ExpectationResult(true, this.value, 'to reject');
-                const expectation = new Expectation(rejectValue);
-                return strict ? expectation.toEqualStrict(value) : expectation.toEqual(value);
-            });
+
+        return this.handleResult(
+            new ExpectationResult(
+                this.value.then(
+                    (resolveValue) => false,
+                    (rejectValue) => {
+                        if (!value) return true;
+                        const expectation = new Expectation(rejectValue);
+                        return strict ? expectation.toEqualStrict(value) : expectation.toEqual(value);
+                    }
+                ),
+                this.value,
+                'to reject'
+            )
+        );
     }
 }
 
 module.exports.Expectation = Expectation;
-module.exports.expect = (value) => new Expectation(value);
