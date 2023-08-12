@@ -52,17 +52,19 @@ class Test extends EventEmitter {
         if (!this.canAddInnerTest(innerTest)) return;
         if (testStore.testsExist(innerTest.absoluteTitle)) {
             return innerTest.deepRun();
-            // throw new Error(`Attempt to register test with duplicate name "${innerTest.absoluteTitle}"`);
         }
 
         testStore.addTest(innerTest);
         this.innerTests.push(innerTest);
 
         if (typeof input === 'function') {
-            input.call(innerTest, {
+            const fnRes = input.call(innerTest, {
                 test: innerTest.test.bind(innerTest),
                 expect: innerTest.expect.bind(innerTest),
             });
+            if (fnRes instanceof Promise) {
+                await fnRes;
+            }
         } else if (typeof input === 'object') {
             if (input instanceof ExpectationResult) {
                 innerTest.microTests.push(
@@ -100,6 +102,7 @@ class Test extends EventEmitter {
         innerTest.addToAll(innerTest.microTests.length);
 
         await innerTest.run();
+        return innerTest;
     }
 
     addToAll(cnt) {
@@ -133,7 +136,7 @@ class Test extends EventEmitter {
                     Logger.printMicroTestResult(microTest);
                 })
                 .catch((err) => {
-                    Logger.printMicroTestError(this, microTest, err);
+                    Logger.printMicroTestError(microTest, err);
                     this.fail(microTest);
                 })
                 .then(this.checkCompletion.bind(this));
