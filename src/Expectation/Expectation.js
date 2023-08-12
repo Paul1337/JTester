@@ -147,8 +147,8 @@ class Expectation {
         return this.handleResult(new ExpectationResult(this._toBeArray(), this.value, 'to be an Array'));
     }
 
-    _toBeArray(value) {
-        return Array.isArray(value);
+    _toBeArray() {
+        return Array.isArray(this.value);
     }
 
     toHaveProperty(keyPath, value, strict = false) {
