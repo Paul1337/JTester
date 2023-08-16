@@ -110,7 +110,7 @@ test('Math', [
 
 Actually, you can pass a function as the second argument.  
 In that case you need to get **env** object passed to the function and use its *expect* and *test*.
-Alternatively, you can use this.expect / this.test, but then you have can't use arrow function syntax.
+Alternatively, you can use this.expect / this.test, but then you can't use arrow function syntax.
 
 ```js
 test('Functional block', (env) => {
@@ -131,7 +131,8 @@ test('Functional block', (env) => {
 });
 ```
 This way you will be seeing logging in another format, due to the heirarhy of tests and total result will only be displayed for top level blocks, aggregating all inner tests. Not for every block.  
-Also, titles of blocks should be unique in the their scope, otherwise you will get an error.
+
+Also, titles of blocks should be unique in the their scope, if you run **test()** on existing test, *JTester* will try to run the same test again (won't consider it as a new one) - this is useful in run-time testing when you want to run test again on some button click or other app event.
 
 When using function as the second argument you can describe tests using **described(text)** method shown above.
 

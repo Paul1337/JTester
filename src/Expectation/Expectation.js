@@ -168,7 +168,7 @@ class Expectation {
         let cur = this.value;
         for (let prop of props) {
             cur = cur?.[prop];
-            if (!cur) return false;
+            if (cur === undefined) return false;
         }
         if (!value) return true;
         if (!strict) return new Expectation(cur)._toEqual(value);

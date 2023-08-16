@@ -171,6 +171,10 @@ class Test extends EventEmitter {
         }
     }
 
+    get OK() {
+        return this.passed === this.all;
+    }
+
     get allDone() {
         return this.failed + this.passed === this.all;
     }
