@@ -10,6 +10,38 @@ class Expectation {
     constructor(value) {
         this.value = value;
         this.isInversed = false;
+
+        this.results = [];
+        // this.chains = [];
+        this.resultInd = -1;
+    }
+
+    described(description) {
+        if (this.result) this.result.description = description;
+        return this;
+    }
+
+    async solve() {
+        this.resultInd = -1;
+        for (let result of this.results) {
+            this.resultInd++;
+            let ok = true;
+            await result.solve().then(() => {
+                ok = result.state;
+            });
+            if (!ok) break;
+        }
+    }
+
+    chain(callback) {
+        // this.chains.push(callback);
+        this.value = callback(this.value);
+        return this;
+    }
+
+    get result() {
+        if (this.results.length === 0) return;
+        return this.results[this.resultInd];
     }
 
     get not() {
@@ -20,8 +52,9 @@ class Expectation {
 
     handleResult(result) {
         const totalResult = this.isInversed ? result.inversed() : result;
-        if (this.onTestCall) this.onTestCall(totalResult);
-        return totalResult;
+        this.results.push(totalResult);
+        this.value = totalResult.expected;
+        return this;
     }
 
     toContain(item) {

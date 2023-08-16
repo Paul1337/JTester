@@ -8,43 +8,43 @@ class ExpectationResult {
         this.expectAction = expectAction;
         this.isInversed = false;
         this.description = null;
-
-        this.chains = [];
-        this.chainIndex = 0;
     }
 
     async solve() {
         if (this.state instanceof Promise) {
-            return this.state.then((value) => {
-                if (value instanceof ExpectationResult) {
-                    return value.solve().then((result) => {
-                        console.log('inner', result);
-                        this.state = result;
+            return this.state.then(
+                (value) => {
+                    if (value instanceof ExpectationResult) {
+                        return value.solve().then((result) => {
+                            console.log('inner', result);
+                            this.state = result;
 
-                        this.recieved = value.recieved;
-                        this.expected = value.expected;
-                        this.expectAction = value.expectAction;
-                        this.isInversed = value.isInversed;
+                            this.recieved = value.recieved;
+                            this.expected = value.expected;
+                            this.expectAction = value.expectAction;
+                            this.isInversed = value.isInversed;
 
-                        return result;
-                    });
-                } else if (typeof value === 'boolean') {
-                    this.state = value;
-                    return value;
-                } else {
-                    throw new Error('State is resolved in unknown format');
+                            return result;
+                        });
+                    } else if (typeof value === 'boolean') {
+                        this.state = value;
+                        return value;
+                    } else {
+                        throw new Error('State is resolved in unknown format');
+                    }
                 }
-            });
+                // (err) => {
+                //     console.log('Error:', err);
+                //     this.state = false;
+                //     return false;
+                // }
+            );
         }
-        return value;
-    }
-
-    chain(callback) {
-        this.chains.push(callback);
+        return this.state;
     }
 
     get stateStr() {
-        return this.state ? 'OK' : 'FAILED';
+        return this.state === true ? 'OK' : 'FAILED';
     }
 
     get recievedFormatted() {
@@ -65,7 +65,7 @@ class ExpectationResult {
     }
 
     get resultTxt() {
-        if (this.state) {
+        if (this.state === true) {
             return this.stateStr;
         } else {
             const inv = this.isInversed ? 'not ' : '';

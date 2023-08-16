@@ -28,15 +28,15 @@ class Logger {
 
     static printMicroTestResult(microTest) {
         const itemInfo =
-            microTest.value.description ??
+            microTest.value.result.description ??
             microTest.meta.description ??
             microTest.meta.index ??
             'no-descr';
         const resultMsg = `${microTest.meta.absoluteTitle} (${itemInfo}): ${colors.bold(
-            microTest.value.resultTxt
+            microTest.value.result.resultTxt
         )}`;
         const messageFormatted =
-            microTest.value.state === true ? colors.green(resultMsg) : colors.red(resultMsg);
+            microTest.value.result.state === true ? colors.green(resultMsg) : colors.red(resultMsg);
         console.log(messageFormatted);
     }
 

@@ -33,11 +33,14 @@ class Test extends EventEmitter {
         this.all = 0;
 
         this.isFinished = false;
+
+        this.innerTestsStartedToRegister = 0;
+        this.innerTestsRegistered = 0;
     }
 
     expect(value) {
-        const expectation = new Expectation(value, this);
-        expectation.onTestCall = (expResult) => this.addMicroTest(expResult);
+        const expectation = new Expectation(value);
+        this.addMicroTest(expectation);
         return expectation;
     }
 
@@ -48,6 +51,8 @@ class Test extends EventEmitter {
     }
 
     async test(title, input) {
+        this.innerTestsStartedToRegister++;
+
         const innerTest = new Test(title, this);
         if (!this.canAddInnerTest(innerTest)) return;
         if (testStore.testsExist(innerTest.absoluteTitle)) {
@@ -66,7 +71,7 @@ class Test extends EventEmitter {
                 await fnRes;
             }
         } else if (typeof input === 'object') {
-            if (input instanceof ExpectationResult) {
+            if (input instanceof Expectation) {
                 innerTest.microTests.push(
                     new MicroTest(input, { index: 1, absoluteTitle: innerTest.absoluteTitle })
                 );
@@ -101,6 +106,7 @@ class Test extends EventEmitter {
 
         innerTest.addToAll(innerTest.microTests.length);
 
+        this.innerTestsRegistered++;
         await innerTest.run();
         return innerTest;
     }
@@ -124,11 +130,11 @@ class Test extends EventEmitter {
         // Logger.printTestStart(this);
 
         const promises = this.microTests.map((microTest) => {
-            const expectationResult = microTest.value;
-            return expectationResult
+            const expectation = microTest.value;
+            return expectation
                 .solve()
                 .then(() => {
-                    if (expectationResult.state === true) {
+                    if (expectation.result.state === true) {
                         this.pass(microTest);
                     } else {
                         this.fail(microTest);
@@ -176,11 +182,12 @@ class Test extends EventEmitter {
     }
 
     get allDone() {
+        if (this.innerTestsStartedToRegister > this.innerTestsRegistered) return false;
         return this.failed + this.passed === this.all;
     }
 
-    addMicroTest(result) {
-        const microTest = new MicroTest(result, {
+    addMicroTest(expectation) {
+        const microTest = new MicroTest(expectation, {
             index: this.microTests.length + 1,
             absoluteTitle: this.absoluteTitle,
         });
