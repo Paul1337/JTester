@@ -1,6 +1,6 @@
 {
     "name": "jtester",
-    "version": "4.0.4",
+    "version": "5.0.0",
     "description": "A tool for testing, with support of runtime testing",
     "main": "src/index.js",
     "bin": {
