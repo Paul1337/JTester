@@ -145,6 +145,12 @@ test(
 );
 ```
 
+You can chain expect results using `chain` method, which may be a handy thing:
+
+```js
+test('math', expect(add(2, 2)).toBe(4).chain(v => v + 2).toBe(6));
+```
+
 ## In-dev testing
 
 You can use jtester as a cli tool to test all files in directory that match pattern \*.test.js.
