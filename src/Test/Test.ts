@@ -1,9 +1,8 @@
-const { EventEmitter } = require('events');
-const { Expectation } = require('../Expectation/Expectation.js');
-const { testStore } = require('./TestStore.js');
-const MicroTest = require('./MicroTest.js');
-const Logger = require('../Logger.js');
-const ExpectationResult = require('../Expectation/ExpectationResult.js');
+import { EventEmitter } from 'events';
+import Expectation from '../Expectation/Expectation';
+import { testStore } from './TestStore';
+import MicroTest from './MicroTest';
+import Logger from '../Logger';
 
 const Events = {
     Finished: 'finish',
@@ -11,8 +10,22 @@ const Events = {
     PassedMicroTest: 'passedMicro',
 };
 
-class Test extends EventEmitter {
-    constructor(title, parentTest) {
+export default class Test extends EventEmitter {
+    title: string;
+    innerTests: Test[];
+    parentTest: Test | undefined;
+    absoluteTitle: string;
+    microTests: MicroTest[];
+
+    passed: number;
+    failed: number;
+    all: number;
+
+    isFinished: boolean;
+    innerTestsStartedToRegister: number;
+    innerTestsRegistered: number;
+
+    constructor(title: string, parentTest?: Test) {
         super();
 
         this.title = title;
@@ -38,19 +51,19 @@ class Test extends EventEmitter {
         this.innerTestsRegistered = 0;
     }
 
-    expect(value) {
+    expect(value: any) {
         const expectation = new Expectation(value);
         this.addMicroTest(expectation);
         return expectation;
     }
 
-    canAddInnerTest(innerTest) {
+    canAddInnerTest(innerTest: Test) {
         if (globalThis.TEST_TITLE && !globalThis.TEST_TITLE.startsWith(innerTest.absoluteTitle))
             return false;
         return true;
     }
 
-    async test(title, input) {
+    async test(title: string, input: any) {
         this.innerTestsStartedToRegister++;
 
         const innerTest = new Test(title, this);
@@ -111,7 +124,7 @@ class Test extends EventEmitter {
         return innerTest;
     }
 
-    addToAll(cnt) {
+    addToAll(cnt: number) {
         this.all += cnt;
         if (this.parentTest) {
             this.parentTest.addToAll(cnt);
@@ -119,7 +132,7 @@ class Test extends EventEmitter {
     }
 
     async deepRun() {
-        const promises = [this.run()];
+        const promises: Promise<any>[] = [this.run()];
         for (let test of this.innerTests) {
             promises.push(test.deepRun());
         }
@@ -141,7 +154,7 @@ class Test extends EventEmitter {
                     }
                     Logger.printMicroTestResult(microTest);
                 })
-                .catch((err) => {
+                .catch((err: Error) => {
                     Logger.printMicroTestError(microTest, err);
                     this.fail(microTest);
                 })
@@ -150,7 +163,7 @@ class Test extends EventEmitter {
         await Promise.all(promises);
     }
 
-    pass(microTest) {
+    pass(microTest: MicroTest) {
         this.passed++;
         this.emit(Events.PassedMicroTest, microTest);
         if (this.parentTest) {
@@ -158,7 +171,7 @@ class Test extends EventEmitter {
         }
     }
 
-    fail(microTest) {
+    fail(microTest: MicroTest) {
         this.failed++;
         this.emit(Events.FailedMicroTest, microTest);
         if (this.parentTest) {
@@ -186,7 +199,7 @@ class Test extends EventEmitter {
         return this.failed + this.passed === this.all;
     }
 
-    addMicroTest(expectation) {
+    addMicroTest(expectation: Expectation<any>) {
         const microTest = new MicroTest(expectation, {
             index: this.microTests.length + 1,
             absoluteTitle: this.absoluteTitle,
@@ -194,5 +207,3 @@ class Test extends EventEmitter {
         this.microTests.push(microTest);
     }
 }
-
-module.exports = Test;

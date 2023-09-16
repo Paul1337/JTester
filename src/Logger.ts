@@ -1,7 +1,10 @@
+import MicroTest from './Test/MicroTest';
+import Test from './Test/Test';
+
 const colors = require('colors/safe');
 // colors.enable();
 
-class Logger {
+export default class Logger {
     static printGlobalResult() {
         if (globalTest.failed + globalTest.passed === globalTest.all) {
             console.log(`Global JTesting finished!`);
@@ -17,16 +20,16 @@ class Logger {
         else Logger.printFailedMicrotests();
     }
 
-    static printTestResult(test) {
+    static printTestResult(test: Test) {
         const resultTxt = `${test.title} result: ${test.passed} of ${test.all}`;
         console.log(test.passed < test.all ? colors.yellow(resultTxt) : resultTxt);
     }
 
-    static printTestStart(test) {
+    static printTestStart(test: Test) {
         console.log(`JTesting started: ${test.absoluteTitle}`);
     }
 
-    static printMicroTestResult(microTest) {
+    static printMicroTestResult(microTest: MicroTest) {
         const itemInfo =
             microTest.value.result.description ??
             microTest.meta.description ??
@@ -48,9 +51,7 @@ class Logger {
         }
     }
 
-    static printMicroTestError(microtest, error) {
+    static printMicroTestError(microtest: MicroTest, error: Error) {
         console.log(colors.red(`${microtest.meta.absoluteTitle}: Error - ${error.message ?? error}`));
     }
 }
-
-module.exports = Logger;

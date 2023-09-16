@@ -1,22 +1,25 @@
-const { isTestProp } = require('../utils.js');
-const ExpectationResult = require('./ExpectationResult.js');
+import ExpectationResult from './ExpectationResult';
 
-function isFloat(value) {
+function isFloat(value: any) {
     if (typeof value === 'number' && !Number.isNaN(value) && !Number.isInteger(value)) return true;
     return false;
 }
 
-class Expectation {
-    constructor(value) {
+export default class Expectation<T> {
+    isInversed: boolean;
+    results: ExpectationResult[];
+    resultInd: number;
+    value: T;
+
+    constructor(value: T) {
         this.value = value;
         this.isInversed = false;
 
         this.results = [];
-        // this.chains = [];
         this.resultInd = -1;
     }
 
-    described(description) {
+    described(description: string) {
         if (this.result) this.result.description = description;
         return this;
     }
@@ -27,20 +30,19 @@ class Expectation {
             this.resultInd++;
             let ok = true;
             await result.solve().then(() => {
-                ok = result.state;
+                ok = result.state as boolean;
             });
             if (!ok) break;
         }
     }
 
-    chain(callback) {
+    chain(callback: (value: T) => T) {
         // this.chains.push(callback);
         this.value = callback(this.value);
         return this;
     }
 
     get result() {
-        if (this.results.length === 0) return;
         return this.results[this.resultInd];
     }
 
@@ -50,73 +52,73 @@ class Expectation {
         return newExpectation;
     }
 
-    handleResult(result) {
+    handleResult(result: ExpectationResult) {
         const totalResult = this.isInversed ? result.inversed() : result;
         this.results.push(totalResult);
         this.value = totalResult.expected;
         return this;
     }
 
-    toContain(item) {
+    toContain(item: any) {
         return this.handleResult(
             new ExpectationResult(this._toContain(item), this.value, 'to contain', item)
         );
     }
 
-    _toContain(item) {
+    _toContain(item: any) {
         if ((typeof this.value === 'string' && typeof item === 'string') || Array.isArray(this.value))
             return this.value.includes(item);
         return false;
     }
 
-    toBe(value) {
+    toBe(value: any) {
         return this.handleResult(new ExpectationResult(this._toBe(value), this.value, 'to be', value));
     }
 
-    _toBe(value) {
+    _toBe(value: any) {
         return this.value == value;
     }
 
-    toBeStrict(value) {
+    toBeStrict(value: any) {
         return this.handleResult(
             new ExpectationResult(this._toBeStrict(value), this.value, 'to be strict', value)
         );
     }
 
-    _toBeStrict(value) {
+    _toBeStrict(value: any) {
         if (this.value === 0 && value === 0) return true;
         return Object.is(this.value, value);
     }
 
-    toEqual(value, precision) {
+    toEqual(value: any, precision?: number) {
         return this.handleResult(
             new ExpectationResult(this._toEqual(value, precision), this.value, 'to equal', value)
         );
     }
 
-    _toEqual(value, precision) {
+    _toEqual(value: any, precision?: number) {
         return this._toEqualGeneric(value, this._toBe, precision);
     }
 
-    toEqualStrict(value, precision) {
+    toEqualStrict(value: any, precision?: number) {
         const action = 'to equal strict';
         return this.handleResult(
             new ExpectationResult(this._toEqualStrict(value, precision), this.value, action, value)
         );
     }
 
-    _toEqualStrict(value, precision) {
+    _toEqualStrict(value: any, precision?: number) {
         return this._toEqualGeneric(value, this._toBeStrict, precision);
     }
 
-    toBeCloseTo(value, numDigits = 2) {
+    toBeCloseTo(value: any, numDigits = 2) {
         const action = 'to be close to';
         return this.handleResult(
             new ExpectationResult(this._toBeCloseTo(value, numDigits), this.value, action, value)
         );
     }
 
-    _toBeCloseTo(value, numDigits = 2) {
+    _toBeCloseTo(value: any, numDigits = 2) {
         if (typeof this.value !== 'number' || typeof value !== 'number')
             throw new TypeError('value must be a number');
         return Math.abs(value - this.value) < Math.pow(10, -numDigits) / 2;
@@ -163,7 +165,7 @@ class Expectation {
     }
 
     _toBeNaN() {
-        return isNaN(this.value);
+        return isNaN(Number(this.value));
     }
 
     toBePromise() {
@@ -184,7 +186,7 @@ class Expectation {
         return Array.isArray(this.value);
     }
 
-    toHaveProperty(keyPath, value, strict = false) {
+    toHaveProperty(keyPath: string, value: any, strict = false) {
         return this.handleResult(
             new ExpectationResult(
                 this._toHaveProperty(keyPath, value, strict),
@@ -196,9 +198,9 @@ class Expectation {
         );
     }
 
-    _toHaveProperty(keyPath, value, strict = false) {
+    _toHaveProperty(keyPath: string, value: any, strict = false) {
         const props = keyPath.split('.');
-        let cur = this.value;
+        let cur: any = this.value;
         for (let prop of props) {
             cur = cur?.[prop];
             if (cur === undefined) return false;
@@ -208,7 +210,7 @@ class Expectation {
         else return new Expectation(cur)._toEqualStrict(value);
     }
 
-    _toEqualGeneric(value, cmpFn, precision) {
+    _toEqualGeneric(value: any, cmpFn: (value: any) => boolean, precision = 2) {
         if (this.value == undefined || value == undefined) {
             return cmpFn.call(this, value);
         }
@@ -231,36 +233,40 @@ class Expectation {
         }
     }
 
-    toResolve(value, strict = false) {
+    toResolve(value: any, strict = false) {
         if (!this._toBePromise()) return this.toBePromise();
 
-        return this.handleResult(
-            new ExpectationResult(
-                this.value.then(
-                    (resolveValue) => {
-                        if (!value) return true;
-                        const expectation = new Expectation(resolveValue);
-                        return strict ? expectation.toEqualStrict(value) : expectation.toEqual(value);
-                    },
-                    (rejectValue) => false
-                ),
-                this.value,
-                'to resolve'
-            )
+        const expectationResult = new ExpectationResult(
+            (this.value as Promise<any>).then(
+                (resolveValue: any) => {
+                    if (!value) return true;
+                    const expectation = new Expectation(resolveValue);
+                    return strict
+                        ? expectation.toEqualStrict(value).result
+                        : expectation.toEqual(value).result;
+                },
+                (rejectValue: any) => false
+            ),
+            this.value,
+            'to resolve'
         );
+
+        return this.handleResult(expectationResult);
     }
 
-    toReject(value, strict = false) {
+    toReject(value: any, strict = false) {
         if (!this._toBePromise()) return this.toBePromise();
 
         return this.handleResult(
             new ExpectationResult(
-                this.value.then(
-                    (resolveValue) => false,
-                    (rejectValue) => {
+                (this.value as Promise<any>).then(
+                    (resolveValue: any) => false,
+                    (rejectValue: any) => {
                         if (!value) return true;
                         const expectation = new Expectation(rejectValue);
-                        return strict ? expectation.toEqualStrict(value) : expectation.toEqual(value);
+                        return strict
+                            ? expectation.toEqualStrict(value).result
+                            : expectation.toEqual(value).result;
                     }
                 ),
                 this.value,
@@ -269,5 +275,3 @@ class Expectation {
         );
     }
 }
-
-module.exports.Expectation = Expectation;
