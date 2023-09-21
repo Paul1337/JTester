@@ -10,6 +10,11 @@ const Events = {
     PassedMicroTest: 'passedMicro',
 };
 
+export interface ITestEnv {
+    test: Test['test'];
+    expect: Test['expect'];
+}
+
 export default class Test extends EventEmitter {
     title: string;
     innerTests: Test[];
@@ -76,10 +81,11 @@ export default class Test extends EventEmitter {
         this.innerTests.push(innerTest);
 
         if (typeof input === 'function') {
-            const fnRes = input.call(innerTest, {
+            const env: ITestEnv = {
                 test: innerTest.test.bind(innerTest),
                 expect: innerTest.expect.bind(innerTest),
-            });
+            };
+            const fnRes = input.call(innerTest, env);
             if (fnRes instanceof Promise) {
                 await fnRes;
             }
