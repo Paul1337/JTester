@@ -104,7 +104,7 @@ if (config.lang === 'javascript') {
     }
 
     fs.writeFileSync(filePath, mainScript);
-    const result = execSync(`ts-node ${filePath}`);
+    const result = execSync(`npx ts-node ${filePath}`);
     console.log(result.toString());
 }
 
