@@ -2,6 +2,10 @@
 import { EventEmitter } from 'events';
 import Expectation from '../Expectation/Expectation';
 import MicroTest from './MicroTest';
+export interface ITestEnv {
+    test: Test['test'];
+    expect: Test['expect'];
+}
 export default class Test extends EventEmitter {
     title: string;
     innerTests: Test[];

@@ -18,3 +18,4 @@ export declare const test: (title: string, input: any) => Promise<any[] | Test |
 export declare const expect: (value: any) => import("./Expectation/Expectation").default<any>;
 export declare const afterAll: () => void;
 export declare const printResult: typeof Logger.printGlobalResult;
+export * from './Test/Test';

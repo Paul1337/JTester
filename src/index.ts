@@ -1,4 +1,3 @@
-import { after } from 'node:test';
 import Logger from './Logger';
 import MicroTest from './Test/MicroTest';
 import Test from './Test/Test';
@@ -55,4 +54,4 @@ export const test = globalThis.test;
 export const expect = globalThis.expect;
 export const afterAll = globalThis.afterAll;
 export const printResult = globalThis.printResult;
-export { ITestEnv } from './Test/Test';
+export * from './Test/Test';
