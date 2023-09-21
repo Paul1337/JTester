@@ -1,6 +1,6 @@
 {
     "name": "jtester",
-    "version": "6.0.3",
+    "version": "6.0.4",
     "description": "A tool for testing, with support of runtime testing",
     "main": "lib/index.js",
     "types": "types/index.d.ts",
