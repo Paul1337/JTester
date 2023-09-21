@@ -4,6 +4,7 @@ export default class Expectation<T> {
     results: ExpectationResult[];
     resultInd: number;
     value: T;
+    description: string | null;
     constructor(value: T);
     described(description: string): this;
     solve(): Promise<void>;
