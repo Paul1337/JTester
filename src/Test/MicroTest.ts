@@ -1,8 +1,10 @@
+import Expectation from '../Expectation/Expectation';
+
 export default class MicroTest {
-    value: any;
+    value: Expectation<any>;
     meta: Record<string, any>;
 
-    constructor(value: any, meta = {}) {
+    constructor(value: Expectation<any>, meta = {}) {
         this.value = value;
         this.meta = meta;
     }

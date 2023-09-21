@@ -10,6 +10,7 @@ export default class Expectation<T> {
     results: ExpectationResult[];
     resultInd: number;
     value: T;
+    description: string | null = null;
 
     constructor(value: T) {
         this.value = value;
@@ -21,6 +22,7 @@ export default class Expectation<T> {
 
     described(description: string) {
         if (this.result) this.result.description = description;
+        this.description = description;
         return this;
     }
 
@@ -34,6 +36,7 @@ export default class Expectation<T> {
             });
             if (!ok) break;
         }
+        if (this.description) this.result.described(this.description);
     }
 
     chain(callback: (value: T) => T) {
