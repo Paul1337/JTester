@@ -55,3 +55,4 @@ export const test = globalThis.test;
 export const expect = globalThis.expect;
 export const afterAll = globalThis.afterAll;
 export const printResult = globalThis.printResult;
+export { ITestEnv } from './Test/Test';
