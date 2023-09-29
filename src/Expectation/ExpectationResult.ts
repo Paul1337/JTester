@@ -66,7 +66,9 @@ export default class ExpectationResult {
         if (value instanceof Promise) {
             return '<Promise>';
         }
-        return JSON.stringify(value);
+        let pretext = '';
+        if (typeof value === 'object') pretext = '\n';
+        return pretext + JSON.stringify(value, undefined, 4);
     }
 
     get resultTxt() {
